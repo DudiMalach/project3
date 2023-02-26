@@ -3,6 +3,7 @@ import imageHandler from "../2-utils/image-handler";
 import verifyAdmin from "../3-middleware/verify-admin";
 import VacationModel from "../4-models/vacation-model";
 import adminVacationsService from "../5-services/admin-vacations-service";
+import userVacationsService from "../5-services/user-vacations-service";
 
 const router = express.Router();
 
@@ -95,7 +96,7 @@ router.delete("/admin/deletevacations/:id([0-9]+)", async (request: Request, res
 // http://localhost:4000/api/admin/followVacation
 router.post("/admin/followVacation", async (request: Request, response: Response, next: NextFunction) => {
     try {
-      const sendInfo = await adminVacationsService.followVacation(request.body);
+      const sendInfo = await userVacationsService.followVacation(request.body);
       response.status(201).json(sendInfo);
     }
     catch (err: any) {

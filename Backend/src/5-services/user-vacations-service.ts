@@ -75,13 +75,25 @@ async function removeFollow(follow: SavedModel): Promise<void> {
 
 
   async function followVacation(data: SavedModel): Promise<SavedModel> {
-    const sql = `INSERT INTO followers(user_ID,vacation_ID)
+    const sql = `INSERT INTO followers(userId,vacationId)
     VALUES(${data.userId} ,${data.vacationId})`;
     const vacation = await dal.execute(sql);
     return vacation;
   }
 
 
+// Followers:
+// Get all followed vacations:
+async function getAllFollowedVacations(userId: number): Promise<SavedModel> {
+  const sql = `
+      SELECT vacations.vacationId , destination,description, startDate, endDate,  CONVERT(image USING utf8) as image, destination, followers, price 
+      FROM vacations.vacation
+      JOIN followers on vacations.vacationId = followers.vacationId 
+      WHERE userId = ${userId}
+  `;
+  const vacations = await dal.execute(sql);
+  return vacations;
+}
 
 
 
@@ -96,4 +108,5 @@ export default {
     addFollow,
     removeFollow,
     followVacation,
+    getAllFollowedVacations,
 }

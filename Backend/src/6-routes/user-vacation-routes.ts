@@ -5,6 +5,9 @@ import verifyLoggedIn from "../3-middleware/verify-logged-in";
 import SavedModel from "../4-models/savedVacation";
 import { default as userVacationsService, default as vacationsService } from "../5-services/user-vacations-service";
 import { Jwt } from "jsonwebtoken";
+
+
+
 const router = express.Router();
 
 // GET http://localhost:4000/api/users/vacations
@@ -31,31 +34,28 @@ router.get("/users/vacations/images/:imageName", async (request: Request, respon
     }
 });
 
-// POST http://localhost:4000/api/users/follow/:vacationId
-router.post("/users/follow/:vacationId", verifyLoggedIn, async (request: Request, response: Response, next: NextFunction) => {
-    try {
-        const user = cyber.getUserFromToken(request);
-        const vacationId = +request.params.vacationId;
-        await userVacationsService.follow(user.userId, vacationId);
-        response.sendStatus(201);
-    }
-    catch (err: any) {
-        next(err);
-    }
+router.post('/api/followVacation', async (request: Request, response: Response, next: NextFunction) => {
+  try {
+    const sendInfo = await userVacationsService.followVacation(request.body);
+    response.status(201).json(sendInfo);
+  }
+  catch (err: any) {
+    next(err)
+  }
 });
 
-// DELETE http://localhost:4000/api/users/unfollow/:vacationId
-router.delete("/users/unfollow/:vacationId", verifyLoggedIn, async (request: Request, response: Response, next: NextFunction) => {
-    try {
-        const user = cyber.getUserFromToken(request);
-        const vacationId = +request.params.vacationId;
-        await vacationsService.unfollow(user.userId, vacationId);
-        response.sendStatus(204);
-    }
-    catch (err: any) {
-        next(err);
-    }
-});
+// // DELETE http://localhost:4000/api/users/unfollow/:vacationId
+// router.delete("/users/unfollow/:vacationId", verifyLoggedIn, async (request: Request, response: Response, next: NextFunction) => {
+//     try {
+//         const user = cyber.getUserFromToken(request);
+//         const vacationId = +request.params.vacationId;
+//         await vacationsService.unfollow(user.userId, vacationId);
+//         response.sendStatus(204);
+//     }
+//     catch (err: any) {
+//         next(err);
+//     }
+// });
 
 // remove followed vacation
 // http://localhost:4000/api/delete/:vacationId/:userId
@@ -102,6 +102,19 @@ router.delete("/api/removefollow/:id", verifyLoggedIn, async (request: Request, 
       next(err);
     }
   })
+
+
+  router.get('/api/getFollowedVacations', async (request: Request, response: Response, next: NextFunction) => {
+    try {
+      const user = cyber.getUserFromToken(request);
+      const followedVacation = await userVacationsService.getAllFollowedVacations(user.userId);
+      response.json(followedVacation);
+    }
+    catch (err: any) {
+      next(err);
+    }
+  });
+
 
 
 export default router;
